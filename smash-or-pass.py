@@ -6,16 +6,16 @@ from pokesmash import pokemon
 # so i'm just gonna stick with it until it actually becomes a problem
 from pokesmash import participant as part
 
-def main():
+def main() -> None:
 
-    participant_list = part.load_from_csv()
+    participant_list: list[part.Participant] = part.load_from_csv()
 
     for participant in participant_list:
         print()
         print(participant.name)
         print("-" * 51)
-        counter = 1
-        total = len(participant.smashed_list)
+        counter: int = 1
+        total: int = len(participant.smashed_list)
         for pokemon_id, pokemon_name in participant.smashed_list:
             print(f"{pokemon_name.title():<16} ", end="")
             if counter % 3 == 0:

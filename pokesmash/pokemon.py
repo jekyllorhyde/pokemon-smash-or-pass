@@ -19,7 +19,7 @@ TYPES = ["Normal",   "Fire",    "Water",
 # if pkl file doesn't exist, load pokemon data into memory and save for easy access
 # all pokemon currently sit at a 100MB pickle file (i know it's too much)
 if not os.path.exists("../all-pokemon-data.pkl"):
-    all_pokemon = []
+    all_pokemon: str = []
     for pokemon_id in range(1, TOTAL_POKEMON + 1):
         os.system("clear")
         print(f"Loading {pokemon_id}/{TOTAL_POKEMON} Pokemon")

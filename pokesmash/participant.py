@@ -2,30 +2,30 @@ from pokesmash import pokemon
 
 class Participant:
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
-        self.smashed_list = []
-        self.total_smashed = 0
-        self.percent_smashed = 0.0
-        self.type_counts = {"Normal": 0,   "Fire": 0,    "Water": 0,
-                            "Electric": 0, "Grass": 0,   "Ice": 0,
-                            "Fighting": 0, "Poison": 0,  "Ground": 0,
-                            "Flying": 0,   "Psychic": 0, "Bug": 0,
-                            "Rock": 0,     "Ghost": 0,   "Dragon": 0,
-                            "Dark": 0,     "Steel": 0,   "Fairy": 0}
-        self.sorted_type_counts = {}
-        self.preferred_egg_group = ""
-        self.preferred_height = 0.0
-        self.preferred_weight = 0.0
-        self.preffered_appearance1 = ""
-        self.preffered_appearance2 = ""
-        self.preffered_base_exp = 0.0
-        self.preffered_base_stats = 0.0
+        self.smashed_list: list[tuple[int, str]] = []
+        self.total_smashed: int = 0
+        self.percent_smashed: float = 0.0
+        self.type_counts: dict[str, int] = {"Normal": 0,   "Fire": 0,    "Water": 0,
+                                            "Electric": 0, "Grass": 0,   "Ice": 0,
+                                            "Fighting": 0, "Poison": 0,  "Ground": 0,
+                                            "Flying": 0,   "Psychic": 0, "Bug": 0,
+                                            "Rock": 0,     "Ghost": 0,   "Dragon": 0,
+                                            "Dark": 0,     "Steel": 0,   "Fairy": 0}
+        self.sorted_type_counts: dict[str, int] = {}
+        self.preferred_egg_group: str = ""
+        self.preferred_height: float = 0.0
+        self.preferred_weight: float = 0.0
+        self.preffered_appearance1: string = ""
+        self.preffered_appearance2: string = ""
+        self.preffered_base_exp: float = 0.0
+        self.preffered_base_stats: float = 0.0
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         print(self.name)
 
-    def update_attributes(self):
+    def update_attributes(self) -> None:
         self.total_smashed = len(self.smashed_list)
         self.percent_smashed = (self.total_smashed/float(pokemon.TOTAL_POKEMON)) * 100
         for pokemon_id, pokemon_name in self.smashed_list:
@@ -37,13 +37,13 @@ class Participant:
 
 # class Group:
 
-#     def __init__(self, participants):
+#     def __init__(self, participants: list[Participanticipant]):
 #         self.participants = participants
-#         self.smashed_list = 
+#         self.collective_smashed_list: set = {}
 
 
-def load_from_csv(file_name="data.csv"):
-    participant_list = []
+def load_from_csv(file_name:str="data.csv"):
+    participant_list: list[Participant] = []
     with open(file_name, "r") as data_file:
         for pokemon_id, response_list in enumerate([line.strip("\n").split(",") for line in data_file]):
             boolean_response_list = []
