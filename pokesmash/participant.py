@@ -17,13 +17,13 @@ class Participant:
         self.preferred_egg_group: str = ""
         self.preferred_height: float = 0.0
         self.preferred_weight: float = 0.0
-        self.preffered_appearance1: string = ""
-        self.preffered_appearance2: string = ""
+        self.preffered_appearance1: str = ""
+        self.preffered_appearance2: str = ""
         self.preffered_base_exp: float = 0.0
         self.preffered_base_stats: float = 0.0
 
-    def __repr__(self) -> None:
-        print(self.name)
+    def __repr__(self) -> str:
+        return self.name
 
     def update_attributes(self) -> None:
         self.total_smashed = len(self.smashed_list)
@@ -46,7 +46,7 @@ def load_from_csv(file_name:str="data.csv"):
     participant_list: list[Participant] = []
     with open(file_name, "r") as data_file:
         for pokemon_id, response_list in enumerate([line.strip("\n").split(",") for line in data_file]):
-            boolean_response_list = []
+            boolean_response_list: list = []
             for response in response_list:
                 if response == "s":
                     boolean_response_list.append(True)

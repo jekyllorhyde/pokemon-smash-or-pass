@@ -1,4 +1,4 @@
-import plotext
+import plotext # type: ignore
 from pokesmash import pokemon
 # i've really gone back and forth on whether participant is a good name
 # participant is the only word that really makes sense
