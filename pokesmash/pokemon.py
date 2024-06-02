@@ -1,6 +1,7 @@
 import requests
 import os
 import pickle
+from statistics import mean
 
 # this total pokemon count is not correct
 # at the time of writing, there are actually 1025 pokemon
@@ -9,31 +10,84 @@ import pickle
 # the easiest solution is probably just incrementing the id number
 # until the return value is whatever is returned for a pokemon not found by the api
 TOTAL_POKEMON = 1010
-TYPES = ["Normal",   "Fire",    "Water",
-         "Electric", "Grass",   "Ice",
-         "Fighting", "Poison",  "Ground",
-         "Flying",   "Psychic", "Bug",
-         "Rock",     "Ghost",   "Dragon",
-         "Dark",     "Steel",   "Fairy"]
+TYPES = ["normal",   "fire",    "water",
+         "electric", "grass",   "ice",
+         "fighting", "poison",  "ground",
+         "flying",   "psychic", "bug",
+         "rock",     "ghost",   "dragon",
+         "dark",     "steel",   "fairy"]
+STATS = ["hp",
+         "attack",
+         "defense",
+         "special-attack",
+         "special-defense",
+         "speed"]
+API_BASE_URL = "https://pokeapi.co/api/v2/"
+POKEMON_DATA_FILE_NAME = "all-relevant-pokemon-data.pkl"
 
-# if pkl file doesn't exist, load pokemon data into memory and save for easy access
-# all pokemon currently sit at a 100MB pickle file (i know it's too much)
-if not os.path.exists("../all-pokemon-data.pkl"):
-    all_pokemon: list[str] = []
+
+class Pokemon:
+
+    def __init__(self, pokemon_id: int) -> None:
+        self.id: int = pokemon_id
+
+        pokemon_data: dict = requests.get(f"{API_BASE_URL}pokemon/{pokemon_id}/").json()
+        self.name: str = pokemon_data["name"]
+        self.typing: tuple[str] = tuple([type["type"]["name"].title() for type in pokemon_data["types"]]) 
+        self.weight: float = pokemon_data["weight"] * 0.220462
+        self.height: float = pokemon_data["height"] * 0.328084
+        self.base_exp: int = pokemon_data["base_experience"]
+        self.base_stats: dict[str, int] = {stat["stat"]["name"]: stat["base_stat"] for stat in pokemon_data["stats"]}
+
+        pokemon_data = requests.get(f"{API_BASE_URL}pokemon-species/{pokemon_id}/").json()
+        self.egg_groups: tuple[str] = tuple([egg_group["name"] for egg_group in pokemon_data["egg_groups"]])
+
+    def __repr__(self) -> str:
+        return self.name
+
+
+class Group:
+
+    def __init__(self, pokemon_list: list[Pokemon]) -> None:
+        self.pokemon: list[Pokemon] = pokemon_list
+        self.count: int = len(pokemon_list)
+        self.type_counts: dict[str, int] = {type: 0 for type in TYPES}
+        for pokemon in pokemon_list:
+            for type in pokemon.typing:
+                self.type_counts[type] += 1
+        self.average_weight: float = mean([pokemon.weight for pokemon in pokemon_list])
+        self.average_height: float = mean([pokemon.height for pokemon in pokemon_list])
+        self.average_exp: float = mean([pokemon.base_exp for pokemon in pokemon_list])        
+        self.average_stats: dict[str: float] = {"hp": 0,
+                                                "attack": 0,
+                                                "defense": 0,
+                                                "special-attack": 0,
+                                                "special-defense": 0,
+                                                "speed": 0}
+        for pokemon in pokemon_list:
+            for type in TYPES:
+                self.average_stats[type] += pokemon.base_stats[type]
+        for type, value in self.average_stats.items():
+            self.average_stats[type] = value / self.count
+
+
+all_pokemon: list[Pokemon] = []
+
+# so i fixed this for the most part
+# dealing with the entire json files converted to dicts was not feasible
+# current file size is down from over 100M to under 200K
+# not sure if currently needed data is final, so that might grow slightly
+# even then, the change should be inconsequential
+if not os.path.exists(POKEMON_DATA_FILE_NAME):
     for pokemon_id in range(1, TOTAL_POKEMON + 1):
         os.system("clear")
         print(f"Loading {pokemon_id}/{TOTAL_POKEMON} Pokemon")
-        all_pokemon.append(requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}/").json())
-    with open("../all-pokemon-data.pkl", "wb") as pickle_file:
+        all_pokemon.append(Pokemon(pokemon_id))
+    print(f"All Pokemon Data Successfully Saved to {POKEMON_DATA_FILE_NAME}")
+    with open(POKEMON_DATA_FILE_NAME, "wb") as pickle_file:
         pickle.dump(all_pokemon, pickle_file)
 
-# this definitely can be done better, 100MB of memory is way too much
-# though i don't think anyone is running less than 4GB of ram these days
-# so i dont think it's super necessary to fix it right now
-# simplest fix would be to only save the required pokemon as the program moves along
-# only saving the specifically required infomation for each pokemon would be even better
-_all_pokemon_data_file = open("../all-pokemon-data.pkl", "rb")
-all_pokemon_data = pickle.load(_all_pokemon_data_file)
-_all_pokemon_data_file.close()
-
+else:
+    with open(POKEMON_DATA_FILE_NAME, "rb") as _all_pokemon_data_file:
+        all_pokemon = pickle.load(_all_pokemon_data_file)
 
